@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>PWA E-Commerce </title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+      color: #222;
+    }
+    header {
+      background: #1976d2;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 2rem auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      width: 260px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.2s;
+    }
+    .product-card:hover {
+      box-shadow: 0 4px 16px rgba(25,118,210,0.15);
+    }
+    .product-card img {
+      width: 100%;
+      max-width: 180px;
+      height: auto;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .product-title {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+    }
+    .product-price {
+      color: #1976d2;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .btn {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #135ba1;
+    }
+    .notify-btn {
+      margin: 2rem auto 0;
+      display: block;
+      background: #43a047;
+    }
+    @media (max-width: 700px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+      .product-card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Insta_cart</h1>
+    <p>Progressive Web App E-Commerce Demo</p>
+  </header>
+  <button class="btn notify-btn" id="notifyBtn">Enable Push Notifications</button>
+  <main>
+    <div class="container" id="productList">
+      <!-- Product cards will be injected here -->
+    </div>
+  </main>
+
+  <script>
+    // Sample product data
+    const products = [
+      { id: 1, title: "Wireless Headphones", price: "$59.99", img: "https://telefonika.com/wp-content/uploads/2021/02/Sony-WH-CH520-Wireless-Headphones-Bluetooth-On-Ear-Headset.jpg" },
+      { id: 2, title: "Smart Watch", price: "$99.99", img: "https://images-na.ssl-images-amazon.com/images/I/61wCG7PJoyL.jpg" },
+      { id: 3, title: "Bluetooth Speaker", price: "$34.99", img: "https://tse4.mm.bing.net/th/id/OIP.gLnLWqm-g0_Ew0pekb8fegHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" }
+    ];
+
+    // Render products
+    const productList = document.getElementById('productList');
+    products.forEach(p => {
+      productList.innerHTML += `
+        <div class="product-card">
+          <img src="${p.img}" alt="${p.title}">
+          <div class="product-title">${p.title}</div>
+          <div class="product-price">${p.price}</div>
+          <button class="btn">Add to Cart</button>
+        </div>
+      `;
+    });
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registered:', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+
+    // Push Notification Request
+    document.getElementById('notifyBtn').addEventListener('click', () => {
+      if (!('Notification' in window)) {
+        alert('This browser does not support notifications.');
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification('Push Notifications Enabled!', {
+              body: 'You will now receive updates and offers.',
+              icon: 'https://i.imgur.com/8Km9tLL.png'
+            });
+          });
+        } else {
+          alert('Notification permission denied.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
